@@ -12,6 +12,8 @@ class _CalculationState extends State<Calculation> {
   int? firstOperand;
   int? secondOperand;
   String? operator;
+  double? width;
+  double? height;
 
   Color operatorColour = const Color.fromRGBO(220, 220, 220, 1);
 
@@ -43,9 +45,17 @@ class _CalculationState extends State<Calculation> {
     return CalculatorButton(
         label: text,
         onTap: onTap,
-        size: 90,
+        width: (width! / 4) - 12,
+        height: (height! / 4) - 12,
         backgroundColour: backgroundColour,
         labelColour: textColour);
+  }
+
+  @override
+  void didChangeDependencies() {
+    width = MediaQuery.of(context).size.width;
+    height = MediaQuery.of(context).size.height;
+    super.didChangeDependencies();
   }
 
   @override
