@@ -10,7 +10,7 @@ class ResultDisplay extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
         width: double.infinity,
-        height: 120,
+        height: 150,
         color: Colors.black,
         child: Container(
           alignment: Alignment.bottomRight,
@@ -20,8 +20,11 @@ class ResultDisplay extends StatelessWidget {
           ),
           child: Text(
             text,
+            maxLines: 1,
+            softWrap: false,
+            overflow: TextOverflow.fade,
             style: TextStyle(
-              color: Colors.white, fontSize: 34
+              color: Colors.white, fontSize: 36
             )
           )
         )
