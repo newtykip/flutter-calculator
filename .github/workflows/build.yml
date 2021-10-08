@@ -1,0 +1,61 @@
+name: Build the Calculator for all platforms
+
+on:
+  release:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: ${{ matrix.buildType }} Build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        buildType:
+          - web
+          - appbundle
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install Java
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.8
+
+      - name: Install Android SDK
+        if: ${{ matrix.buildType == 'appbundle' }}
+        uses: android-actions/setup-android@v2
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v1
+        with:
+          flutter-version: "2.x"
+
+      - name: Install Dependencies
+        run: flutter pub get
+
+      - name: Build
+        run: flutter build ${{ matrix.buildType }}
+
+      - name: Upload App Bundle
+        if: ${{ matrix.buildType == 'appbundle' }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: Android-Build
+          path: build/app/outputs/bundle/release/app-release.aab
+
+      - name: Upload Web Build
+        if: ${{ matrix.buildType == 'web' }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: Web-Build
+          path: build/web
+
+      - name: Deploy Website to GitHub pages
+        if: ${{ matrix.buildType == 'web' }}
+        uses: JamesIves/github-pages-deploy-action@4.1.5
+        with:
+          branch: gh-pages
+          folder: build/web
