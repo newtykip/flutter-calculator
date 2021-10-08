@@ -5,14 +5,14 @@ class CalculatorButton extends StatelessWidget {
       {required this.label,
       required this.onTap,
       required this.size,
-      this.backgroundColor = Colors.white,
-      this.labelColor = Colors.black});
+      this.backgroundColour = Colors.white,
+      this.labelColour = Colors.black});
 
   final String label;
   final VoidCallback onTap;
   final double size;
-  final Color backgroundColor;
-  final Color labelColor;
+  final Color backgroundColour;
+  final Color labelColour;
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +27,7 @@ class CalculatorButton extends StatelessWidget {
                     color: Colors.grey, offset: Offset(1, 1), blurRadius: 2),
               ],
               borderRadius: BorderRadius.all(Radius.circular(size / 2)),
-              color: backgroundColor
+              color: backgroundColour
             ),
             child: InkWell(
               customBorder: RoundedRectangleBorder(
@@ -39,7 +39,7 @@ class CalculatorButton extends StatelessWidget {
                   label,
                   style: TextStyle(
                     fontSize: 24,
-                    color: labelColor
+                    color: labelColour
                   )
                 )
               )
