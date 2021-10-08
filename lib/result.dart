@@ -10,11 +10,14 @@ class ResultDisplay extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
         width: double.infinity,
-        height: 80,
+        height: 120,
         color: Colors.black,
         child: Container(
-          alignment: Alignment.centerRight,
-          padding: EdgeInsets.only(right: 24),
+          alignment: Alignment.bottomRight,
+          padding: EdgeInsets.only(
+            right: 24,
+            bottom: 24
+          ),
           child: Text(
             text,
             style: TextStyle(
