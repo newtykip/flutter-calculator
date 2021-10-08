@@ -14,6 +14,7 @@ jobs:
         buildType:
           - web
           - appbundle
+          - apk
 
     steps:
       - name: Checkout
@@ -25,7 +26,7 @@ jobs:
           java-version: 1.8
 
       - name: Install Android SDK
-        if: ${{ matrix.buildType == 'appbundle' }}
+        if: ${{ matrix.buildType == 'appbundle' || matrix.buildType == 'apk' }}
         uses: android-actions/setup-android@v2
 
       - name: Install Flutter
@@ -43,8 +44,15 @@ jobs:
         if: ${{ matrix.buildType == 'appbundle' }}
         uses: actions/upload-artifact@v2
         with:
-          name: Android-Build
+          name: App-Bundle
           path: build/app/outputs/bundle/release/app-release.aab
+
+      - name: Upload APK
+        if: ${{ matrix.buildType == 'apk' }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: APK
+          path: build/app/outputs/flutter-apk/app-release.apk
 
       - name: Upload Web Build
         if: ${{ matrix.buildType == 'web' }}

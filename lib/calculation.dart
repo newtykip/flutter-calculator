@@ -8,30 +8,37 @@ class Calculation extends StatefulWidget {
 }
 
 class _CalculationState extends State<Calculation> {
-  int? result;
-  int? firstOperand;
-  int? secondOperand;
+  BigInt? result;
+  BigInt? firstOperand;
+  BigInt? secondOperand;
   String? operator;
-  double? width;
-  double? height;
-
+  double? size;
+  final int maxLength = 9;
   Color operatorColour = const Color.fromRGBO(220, 220, 220, 1);
 
   String _getDisplayText() {
+    debugPrint('Result: $result');
+    debugPrint('Operator: $operator');
+    debugPrint('First Operand: $firstOperand');
+    debugPrint('Second Operand: $secondOperand');
+
     if (result != null) {
-      return '$result';
+      var divisionCount = 0;
+
+      while (result.toString().length > maxLength) {
+        result = BigInt.from(result! / BigInt.from(10));
+        divisionCount++;
+      }
+
+      return '${result}e+$divisionCount';
     }
 
     if (secondOperand != null) {
-      return '$firstOperand$operator$secondOperand';
-    }
-
-    if (operator != null) {
-      return '$firstOperand$operator';
+      return secondOperand.toString();
     }
 
     if (firstOperand != null) {
-      return '$firstOperand';
+      return firstOperand.toString();
     }
 
     return '0';
@@ -45,16 +52,18 @@ class _CalculationState extends State<Calculation> {
     return CalculatorButton(
         label: text,
         onTap: onTap,
-        width: (width! / 4) - 12,
-        height: (height! / 4) - 12,
+        size: size! / 2.5,
         backgroundColour: backgroundColour,
         labelColour: textColour);
   }
 
   @override
   void didChangeDependencies() {
-    width = MediaQuery.of(context).size.width;
-    height = MediaQuery.of(context).size.height;
+    var q = MediaQuery.of(context).size;
+    size = q.width > q.height ? q.width : q.height;
+    size = size! / 5;
+    debugPrint('Size: $size');
+    debugPrint('Dimensions: ${q.width}x${q.height}');
     super.didChangeDependencies();
   }
 
@@ -62,15 +71,18 @@ class _CalculationState extends State<Calculation> {
   Widget build(BuildContext context) {
     return Column(children: [
       ResultDisplay(text: _getDisplayText()),
+      Padding(
+          padding:
+              EdgeInsets.only(top: (size! / 4) / 2, bottom: (size! / 4) / 2)),
       Row(children: [
         _getButton(text: '7', onTap: () => numberPressed(7)),
         _getButton(text: '8', onTap: () => numberPressed(8)),
         _getButton(text: '9', onTap: () => numberPressed(9)),
         _getButton(
-            text: '*',
+            text: 'x',
             onTap: () => operatorPressed('*'),
             backgroundColour: operatorColour)
-      ]),
+      ], mainAxisAlignment: MainAxisAlignment.center),
       Row(children: [
         _getButton(text: '4', onTap: () => numberPressed(4)),
         _getButton(text: '5', onTap: () => numberPressed(5)),
@@ -79,7 +91,7 @@ class _CalculationState extends State<Calculation> {
             text: '/',
             onTap: () => operatorPressed('/'),
             backgroundColour: operatorColour)
-      ]),
+      ], mainAxisAlignment: MainAxisAlignment.center),
       Row(children: [
         _getButton(text: '1', onTap: () => numberPressed(1)),
         _getButton(text: '2', onTap: () => numberPressed(2)),
@@ -88,7 +100,7 @@ class _CalculationState extends State<Calculation> {
             text: '+',
             onTap: () => operatorPressed('+'),
             backgroundColour: operatorColour)
-      ]),
+      ], mainAxisAlignment: MainAxisAlignment.center),
       Row(children: [
         _getButton(
             text: '=',
@@ -101,28 +113,28 @@ class _CalculationState extends State<Calculation> {
             text: '-',
             onTap: () => operatorPressed('-'),
             backgroundColour: operatorColour)
-      ])
+      ], mainAxisAlignment: MainAxisAlignment.center)
     ]);
   }
 
-  numberPressed(int number) {
-    setState(() {
-      // If the previous calculation is finished, set the result to null and set the first operand
-      if (result != null) {
-        result = null;
-        firstOperand = number;
-        return;
-      }
+  numberPressed(int n) {
+    var number = BigInt.from(n);
 
+    setState(() {
       // If the first operand is unset, set it now
       if (firstOperand == null) {
         firstOperand = number;
         return;
       }
 
+      // Cap the first operand at the max length
+      if (firstOperand.toString().length >= maxLength && operator == null) {
+        return;
+      }
+
       // If the operator has not been set, pressing a number will concat the number to the first operand. This allows for multi-digit operations.
       if (firstOperand != null && operator == null) {
-        firstOperand = int.parse('$firstOperand$number');
+        firstOperand = BigInt.parse('$firstOperand$number');
         return;
       }
 
@@ -132,17 +144,21 @@ class _CalculationState extends State<Calculation> {
         return;
       }
 
-      secondOperand = int.parse('$secondOperand$number');
+      if (secondOperand.toString().length >= maxLength) {
+        return;
+      }
+
+      secondOperand = BigInt.parse('$secondOperand$number');
     });
   }
 
-  operatorPressed(String operator) {
-    firstOperand ??= 0;
-    this.operator = operator;
+  operatorPressed(String op) {
+    firstOperand ??= BigInt.from(0);
+    operator = op;
   }
 
   calculateResult() {
-    if (operator == null || secondOperand == null) {
+    if (firstOperand == null || operator == null || secondOperand == null) {
       return;
     }
 
@@ -158,17 +174,16 @@ class _CalculationState extends State<Calculation> {
           result = firstOperand! * secondOperand!;
           break;
         case '/':
-          if (secondOperand == 0) {
+          if (secondOperand == BigInt.from(0)) {
             return;
           }
           result = firstOperand! ~/ secondOperand!;
           break;
       }
 
-      firstOperand = result;
+      firstOperand = null;
       operator = null;
       secondOperand = null;
-      result = null;
     });
   }
 
