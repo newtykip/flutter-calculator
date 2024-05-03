@@ -6,3 +6,5 @@ A simple calculator made in Flutter! Built versions can be found in the releases
 
 - Number formatting
 - Scale for landscape mode
+
+<sub>this project uses the <a href="license.md">opinionated queer license v1.1</a> - tl;dr see <a href="https://oql.avris.it/license.tldr">here</a> :]</sub>
